@@ -26,14 +26,15 @@ Using Prior Semantic Beliefs}
   monolingual and multilingual text corpora. All such techniques are 
   consequentially unaware of the
   potentially crucial information present in handcrafted and automatically
-  produced lexical ontologies that is not evident from text. In this 
+  produced lexical ontologies that is not clearly evident from text. In this 
   paper, we propose a novel approach that combines distributional 
   information with additional knowledge from structured ontologies to 
-  yield semantic word representations that have greater expressive power 
+  yield better quality semantic word representations
   than in isolation. We perform belief propagation on a graph constructed
   using available lexical ontologies to enforce connected words to
   have similar representations and show that our technique is applicable to
-  different word vectors models on a variety of tasks across different languages.
+  different word vectors models across different languages and gives improvement
+  in performance on a variety of evaluation tasks.
 \end{abstract}
 
 \section{Introduction}
@@ -46,13 +47,13 @@ These word vectors can in turn be used for identifying semantically close word
 pairs~\cite{Turney:2006:SSR:1174520.1174523,Agirre:2009:SSR:1620754.1620758} or as features
 in downstream applications like named entity recognition~\cite{turian:2010}.
 
-Data-driven learning of vector-space word embeddings that capture lexico-semantic 
-properties is a technique of central importance in natural language processing. 
-Using cooccurrence statistics from a large corpus of text 
+%Data-driven learning of vector-space word embeddings that capture lexico-semantic 
+%properties is a technique of central importance in natural language processing. 
+It is possible to construct high-quality semantic vectors using cooccurrence 
+statistics from a large corpus of text 
 \cite{deerwester-90}, or using internal representations from neural 
 network models of word sequences~\cite{Collobert:2008:UAN:1390156.1390177} to 
-arrive at vector representations that capture co-occurence tendencies and meanings,
-it is possible to construct high-quality semantic vectors.
+arrive at vector representations that capture co-occurence tendencies and meanings.
 Variants of not only using co-occurrence statistics from monolingual corpora but looking
 at alignments of words across languages~\cite{zou-EtAl:2013:EMNLP,hermann2014multilingual,faruqui-dyer:2014:EACL2014}
 have been shown to perform better than their monolingual counterparts. Another variant of
@@ -65,7 +66,7 @@ in a lexical ontology. Lexical ontologies like the WordNet~\cite{miller:1995},
 FrameNet~\cite{Baker:1998:BFP:980845.980860} or the Paraphrase 
 database~\cite{ganitkevitch2013ppdb} contain words that are connected to other words in 
 the same language through specific relations. These relations in turn determine the semantic
-association between the words. This is an obvious of source of information that has not been
+association between the words. This is an obvious source of information that has not been
 exploited in creating word vectors so far. 
 
 We present a graph-based learning framework which
@@ -74,7 +75,7 @@ are connected to each other. We then perform belief propagation on the graph whi
 similar words to have similar word vector representations. Our method of incorporating prior
 semantic beliefs can be used both while training (\S\ref{sec:improve-tr}) the word vectors or as a 
 post-processing step (\S\ref{sec:post-proc}). 
-We show that our method works well with a large number of 
+We show that our method works well with
 different types of word vector models (\S\ref{sec:vectors}) and gives substantial improvements on a 
 variety of vector evaluations tasks (\S\ref{sec:eval}) while using different kinds of lexical ontologies (\S\ref{sec:onto}) across different languages (\S\ref{sec:multilingual}).
 
@@ -91,10 +92,11 @@ variety of vector evaluations tasks (\S\ref{sec:eval}) while using different kin
 Let $W = \{w_1,...,w_n\}$ be the set of word types and $\Omega$ be an ontology that encodes a set of semantic relations between words in $W$. 
 Specifically, we define $\Omega = (V_\Omega,E_\Omega)$ to be an undirected graph with vertices $V_\Omega = \{v_i | \  \forall \  w_i \in W\}$ and 
 edges $E_\Omega = \{e_{ij}\}$ for every pair of words $(w_i,w_j)$ that are semantically linked according to some relation.
-For now we consider all the word types to be unambiguous in meaning, although later we will see how 
-our model also lets us derive word embeddings for different senses of 
-word types. For the sake of simplicity consider $\forall i, w_i$ to be unambiguous word-types, 
-although the model we propose is flexible enough to accommodate polysemy (\S).
+%For now we consider all the word types to be unambiguous in meaning, although later we will see how 
+%our model also lets us derive word embeddings for different senses of 
+%word types. 
+Since majority of the existing word representation models ignore word-senses,
+we consider $\forall i, w_i$ to be unambiguous word-types.
 
 Then, given a set of vectors $\hat{Q} = \{\hat{q}_i | \  \forall \  w_i \in W\}$ that have been learned from any of the currently available
 methods to obtain word vector representations, our objective is to learn a set of vectors $Q = \{q_i | \  \forall \  w_i \in W\}$ that are 
@@ -103,7 +105,9 @@ connections. The layer containing vectors $Q$ and vectors $\hat{Q}$ can be seen 
 \cite{kindermann80mrf}. We initialize the vectors in $Q$ to be equal to the vectors in $\hat{Q}$.
 and then perform inference to obtain the unobserved (and improved) word representations $\hat{Q}$.
 
-We define the distances between any two nodes as the euclidean distance between them, thus forcing 
+We define the distances between any two nodes as the euclidean distance
+\footnote{Using cosine similarity as distance yields the same update equation for vectors of unit length}
+ between them, thus forcing 
 similar nodes to have similar vector representations. Since, we want the inferred word vector to be
 associated both with its observed value $\hat{q}_i$ and its neighbors 
 $q_j, \forall ij \in E_{\Omega}$, the clique potential becomes:
@@ -112,7 +116,7 @@ $q_j, \forall ij \in E_{\Omega}$, the clique potential becomes:
   \displaystyle C(Q) = \sum_{i=1}^n \left[ \alpha \lVert q_i - \hat{q_i} \rVert^2 + \sum_{ij \in E_{\Omega}} \beta_{ij} \lVert q_i - q_j \rVert^2 \right]
 \end{equation}
 where, $\beta_{ij}$ is the weight of the edges connecting $i,j$ and $\alpha$ is a hyper-parameter to control the degree of deviation of the word 
-vector from its observed value. Equation~\ref{equ:eucl} is a convex optimization problem and a close formed solution does exist but practically is intractable to obtain. Thus, we take the gradient of equation~\ref{equ:eucl} with respect to the parameters to be optimized, namely: $\forall i, q_i$ and equating it to zero get the following update for $q_i$:
+vector from its observed value. Equation~\ref{equ:eucl} is a convex optimization problem and a close formed solution does exist but practically is intractable to compute. Thus, we take the gradient of equation~\ref{equ:eucl} with respect to the parameters to be optimized, namely: $\forall i, q_i$ and equate it to zero get the following update for $q_i$:
 \begin{equation}
   \label{equ:update-vector}
 q_i = \frac{\sum_{j, ij \in E} \beta_{ij} q_j + \alpha \hat{q_i}}{\sum_{j, ij \in E} \beta_{ij} + \alpha}
@@ -194,9 +198,13 @@ as:
 We take gradient of equ.~\ref{equ:prior-lbl} with respect to $\theta$ and add it to the 
 NCE gradient to perform MAP. However, since computing gradient of equ.~\ref{equ:prior-lbl}
 is linear in the vocabulary size $n$, we use lazy updates~\cite{Carpenter08lazysparse} every
-$k$ words during training. We call this the \textbf{MAP} method of improvement during training.
+$k$ words during training i.e, if the gradient update for one training instance is $g$, the
+lazy gradient would be $kg$ and would be computed after every $k$ training instances.
+We call this the \textbf{MAP} method of improvement during training.
 
-Note that the NCE objective is non-convex while the graph based objective (equ.~\ref{equ:update-vector}) is 
+We explore another method of using onotlogical information while training.
+Note that the NCE objective is non-convex while the graph based objective 
+(equ.~\ref{equ:update-vector}) is 
 convex. We alternate between these two objectives while training the word vectors by
 using equation~\ref{equ:update-vector} to re-estimate the word vectors after we visit every 
 $k$ words during training. This method of alternating between a convex and a non-convex
@@ -208,14 +216,15 @@ local optima (\mfar{citation reqd.}). We call this method the \textbf{SWAP} meth
 \label{sec:onto}
 
 We use three different lexical ontologies to separately evaluate their utility in improving
-the word vectors and then merge them all together to act as a single large ontological resource.
+the word vectors.
+% and then merge them all together to act as a single large ontological resource.
 
 \subsection{Paraphrase Database} 
 \label{sec:ppdb}
 
-The paraphrase database (PPDB) \cite{ganitkevitch2013ppdb} is an ontology of more than 220 million paraphrase pairs, including 8 million lexical paraphrases, i.e. paraphrases of length 1. It has been constructed by pivoting words across multiple languages. The key concept behind obtaining lexical paraphrases through pivoting is that words of one language that are aligned to the same word in a different language should be synonymous. For example, if the words \textit{thrown into jail} and \textit{imprisoned} map to the same word in another language, it may be reasonable to assume they have the same meaning. For our experiments, for each lexical paraphrase in PPDB, there exists an edge in our graph. The lexical paraphrase dataset comes in different sizes ranging from S to XXXL, in decreasing order of paraphrasing confidence and increasing order of size. We chose XL size for our experiments that contains approximately $103,000$ paraphrases\footnote{\url{http://www.cis.upenn.edu/~ccb/ppdb/}}.
+The paraphrase database (PPDB) \cite{ganitkevitch2013ppdb} is an ontology of more than 220 million paraphrase pairs, including 8 million lexical paraphrases, i.e. paraphrases of length 1. It has been constructed by pivoting words across multiple languages. The key concept behind obtaining lexical paraphrases through pivoting is that words of one language that are aligned to the same word in a different language should be synonymous. For example, if the words \textit{jailed} and \textit{imprisoned} map to the same word in another language, it may be reasonable to assume they have the same meaning. For our experiments, for each lexical paraphrase in PPDB, there exists an edge in our graph. The lexical paraphrase dataset comes in different sizes ranging from S to XXXL, in decreasing order of paraphrasing confidence and increasing order of size. We chose XL size for our experiments that contains approximately $103,000$ paraphrases\footnote{\url{http://www.cis.upenn.edu/~ccb/ppdb/}}.
 
-Since, the PPDB is a statistically created ontology, it has weights associated 
+Since, PPDB is an automatically created ontology, it has weights associated 
 with the confidence
 of a source word being paraphrased into a target word. We conduct two sets of 
 experiments using the 
@@ -227,12 +236,14 @@ PPDB: (1) All the edge weights are equal, (2) Different edge weights for each ne
 WordNet~\cite{miller:1995} is a large, hand-annotated lexical ontology of English words. 
 It groups English words into sets of synonyms called synsets, provides short, general definitions, and records the various semantic relations between these synonym sets.
 This database is structured in a graph particularly suitable for our task because it explicitly relates concepts with semantically aligned relations such as hypernyms and hyponyms. For example, the word \textit{dog} has a synonym \textit{canine}, a hypernym \textit{puppy} and a hyponym \textit{animal}. We perform two different experiments with WordNet where a given word is connected to
-its: (1) Synonyms, (2) Synonyms, Hypernyms and Hyponyms. Since, WordNet is a carefully hand crafter resource, we at the moment weigh all our edges to be of weight $1$. We get a mapping of approximately $143,000$ words being connected to other words from WordNet.
+its: (1) Synonyms, (2) Synonyms, Hypernyms and Hyponyms. 
+%Since, WordNet is a carefully hand crafter resource, we at the moment weigh all our edges to be of weight $1$. 
+We get a mapping of approximately $143,000$ words being connected to other words from WordNet.
 
 \subsection{FrameNet}
 \label{sec:framenet}
 
-FrameNet~\cite{fillmore-ua-2003} is a rich linguistic resource containing considerable information about
+FrameNet~\cite{fillmore-ua-2003} is a rich linguistic resource containing  information about
 lexical and predicate-argument semantics in English. Grounded in the theory of frame semantics it suggests 
 a semantic representation that blends word-sense disambiguation and semantic role labeling. The FrameNet lexicon
 \cite{Baker:1998:BFP:980845.980860} is a taxonomy of manually identified general-purpose frames for English. 
@@ -302,16 +313,17 @@ where $V$ is the size of the vocabulary.
 \subsection{Synonym Selection (TOEFL)}
 \label{ref:toefl}
 
-The synonym selection task is to select the semantically closest word to a target from a list of candidates. The dataset we use on this task is the TOEFL dataset \cite{landauer:1997} which consists of a list of target words that appear with 4 candidate lexical substitutes each. The dataset contains 80 such questions. An example is ``rug $\rightarrow$ sofa, ottoman, carpet, hallway'', with ``carpet'' being the most synonym-like candidate to the target.
+The synonym selection task is to select the semantically closest word to a target from a list of candidates. The dataset we use on this task is the TOEFL dataset \cite{landauer:1997} which consists of a list of target words that appear with 4 candidate lexical substitutes each. The dataset contains 80 such questions. An example is ``\textit{rug $\rightarrow$ sofa, ottoman, carpet, hallway}'', with ``\textit{carpet}'' being the most synonym-like candidate to the target.
 
 \subsection{Sentiment Analysis (SA)}
 \label{sec:senti}
 
 \newcite{Socher-etal:2013} have created a treebank which contains sentences
-annotated with fine-grained sentiment labels on both the phrase and sentence level.
+annotated with fine-grained sentiment labels on both the phrase and sentence level
+and show that compositional vector space models can be used to predict sentiment
+at these levels with high accuracy.
 These sentences are movie review excerpts originally collected by \newcite{Pang:2005:SSE:1219840.1219855}.
-They show that compositional vector space models can be used to predict sentiment
-at these levels with high accuracy. The coarse-grained treebank, containing only positive and negative 
+They . The coarse-grained treebank, containing only positive and negative 
 classes has been split into training, development and test datasets containing $6920$, $872$ and 
 $1821$ sentences respectively. We train a logistic regression classifier with $L2$ regularization
 on the average of the word 
@@ -335,10 +347,10 @@ during training or as a post-processing step.
 We use equ.~\ref{equ:update-vector} to optimize word vectors using different ontologies
 under different settings as described below.
 
-\paragraph{PPDB.} For every word $w_i$, we set $\alpha_i = 1$ and the edge weight for every neighbor $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. This makes sure that the optimized word vector is still not very far from its original estimate.
+\paragraph{PPDB.} For every word $w_i$, we set $\alpha_i = 1$ and the edge weight for every neighbor $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. This makes sure that the optimized word vector is still not very far from its originally observed estimate.
 
 \paragraph{wtPPDB.} PPDB has weights associated with every paraphrase word pair $p(w_i | w_j)$ and $p(w_j |w_i)$ which are the conditional probabilities of 
-observing the paraphrase given the word and vice versa obtained empirically during the construction of the PPDB. We define $\forall j, \beta_ij = p(w_i | w_j)/2 + p(w_j |w_i)/2$ and keep $\alpha_i = 1$ as in the previous experiment.
+observing the paraphrase given the word and vice versa obtained empirically during the construction of the PPDB. We define $\forall j, \beta_{ij} = p(w_i | w_j)/2 + p(w_j |w_i)/2$ and keep $\alpha_i = 1$ as in the previous experiment.
 
 \paragraph{WN.} We keep all the settings as in \textbf{PPDB} except for using 
 synonyms from WordNet as ontological edges.
@@ -363,7 +375,7 @@ version of PPDB has smaller confidence estimates~\cite{ganitkevitch2013ppdb}.
 Also, the reason that FrameNet does not perform as good as the other 
 ontologies may be because words of significantly different meaning can evoke the 
 same frame. For example, \textit{push} and \textit{growth} are two words of 
-entirely different meaning but they evoke the same frame as describe in \S\ref{sec:framenet}.
+different meanings but they evoke the same frame as describe in \S\ref{sec:framenet}.
 
 \begin{table*}[!tbh]
   \centering
@@ -374,47 +386,47 @@ Vector & Ontology & Dim & WS-353 & RG-65 & MEN & SYN-REL & TOEFL & SA \\
 \multirow{7}{*}{LSA} & -- & 80 & 61.4 & 66.9 & 70.9 & 34.6 & 66.7 & 77.9\\
 
 & PPDB & 80 & 67.7 & 75.2 & \textbf{74.5} & \textbf{43.4} & \textbf{80.0} & \textbf{79.0}\\
-& PPDBwt & 80 & \textbf{68.2} & 75.2 & 74.5 & & 78.6 & 77.9\\
+& PPDBwt & 80 & \textbf{68.2} & 75.2 & 74.5 & 23.6 & 78.6 & 77.9\\
 & WN & 80 & 64.5 & 68.9 & 72.3 & 28.4 & 77.3 & 78.3\\
 & WN++ & 80 & 65.3 & 76.4 & 74.1 & 28.0 & 73.3 & 78.8\\
 & FN & 80 & 61.7 & 67.7 & 70.6 & 31.5 & 70.6 & 76.8\\
-& Union & 80 & 67.4 & \textbf{76.5} & 73.9 & & 73.3 & 77.6\\
+& Union & 80 & 67.4 & \textbf{76.5} & 73.9 & 41.7 & 73.3 & 77.6\\
 \hline\hline
 \multirow{7}{*}{SG} & -- & 80 & 63.9 & 54.6 & 64.6 & 45.5 & 66.7 & 74.5 \\
 
 & PPDB & 80 & \textbf{65.0} & 66.5 & \textbf{68.8} & \textbf{51.8} & \textbf{84.0} & 76.4\\
-& PPDBwt & 80 & 61.6 & 67.1 & 65.5 & & 82.6 &76.4\\
+& PPDBwt & 80 & 61.6 & 67.1 & 65.5 & 29.0 & 82.6 &76.4\\
 & WN & 80 & 55.1 & 64.1 & 59.8 & 33.2 & 80.0 & 75.7 \\
 & WN++ & 80 & 59.8 & 66.3 & 63.9 & 32.1 & 73.3 & 76.1 \\
 & FN & 80 & 54.7 & 53.8 & 59.3 & 36.8 & 70.6 & 75.3\\
-& Union & 80 & 63.8 & \textbf{67.2} & 68.5 & & 77.3 & \textbf{76.4} \\
+& Union & 80 & 63.8 & \textbf{67.2} & 68.5 & 49.8 & 77.3 & \textbf{76.4} \\
 \hline\hline
 \multirow{7}{*}{GC} & -- & 50 & 62.3 & 62.8 & 31.3 & 10.9 & 60.8 & 67.8 \\
 
 & PPDB & 50 & 64.3 & 68.9 & 40.3& \textbf{16.1} & 73.9 & \textbf{68.9}\\
-& PPDBwt & 50 & 60.4 & 59.5 & \textbf{41.6} & & \textbf{78.2} & 67.7\\
+& PPDBwt & 50 & 60.4 & 59.5 & \textbf{41.6} & 11.3 & \textbf{78.2} & 67.7\\
 & WN & 50 & 62.9 & 69.2 & 34.9 & 9.2 & 68.1 & 67.8 \\
 & WN++ & 50 & \textbf{64.6} & 73.0 & 38.0 & 9.6 & 65.2 & 67.9 \\
 & FN & 50 & 62.3 & 66.8 & 33.1 & 10.3 & 65.2 & 68.0\\
-& Union & 50 & 64.2 & \textbf{70.5} & 38.4 & & 72.4 & 68.7 \\
+& Union & 50 & 64.2 & \textbf{70.5} & 38.4 & 14.7 & 72.4 & 68.7 \\
 \hline\hline
 \multirow{7}{*}{Multi} & -- & 512 & 68.1 & 75.5 & 75.8 & 45.5 & 84.0 & 81.0 \\
 
-& PPDB & 512 & \textbf{74.1} & 79.5 & 79.1 & \textbf{49.8} & \textbf{96.0} & 81.5\\
-& PPDBwt & 512 & 73.4 & 80.3 & \textbf{79.6} & & 94.6 & 82.1\\
+& PPDB & 512 & \textbf{74.1} & 79.5 & 79.1 & 49.8 & \textbf{96.0} & 81.5\\
+& PPDBwt & 512 & 73.4 & 80.3 & \textbf{79.6} & 22.5 & 94.6 & 82.1\\
 & WN & 512 & 70.3 & 75.7 & 77.0 & 33.2 & 90.6 & 82.4 \\
 & WN++ & 512 & 72.4 & 84.0 & 78.7 & 36.0 & 90.6 & 82.4 \\
 & FN & 512 & 66.9 & 78.9 & 75.5 & 40.1 & 85.3 & 80.7\\
-& Union & 512 & 73.3 & \textbf{85.2} & \textbf{79.5} & & 92.0 & \textbf{82.4} \\
+& Union & 512 & 73.3 & \textbf{85.2} & \textbf{79.5} & \textbf{50.4} & 92.0 & \textbf{82.4} \\
 \hline\hline
 \multirow{7}{*}{LBL} & -- & 80 & 53.6 & 42.7 & 58.0 & 31.5 & 66.7 & 72.5\\
 
 & PPDB & 80 & 59.1 & \textbf{58.3} & \textbf{63.7} & \textbf{46.2} & \textbf{85.3} & 73.4\\
-& PPDBwt & 80 & \textbf{60.1} & 57.8 & 62.1 & & 78.6 & 73.2\\
+& PPDBwt & 80 & \textbf{60.1} & 57.8 & 62.1 & 27.3 & 78.6 & 73.2\\
 & WN & 80 & 57.9 & 50.6 & 59.9 & 26.8 & 78.7 & 74.0\\
 & WN++ & 80 & 58.9 & 58.1 & 61.5 & 28.3 & 74.7 & 73.1 \\
 & FN & 80 & 52.4 & 47.4 & 57.2 & 28.4 & 72.0 & 72.4\\
-& Union & 80 & 58.7 & 56.8 & 63.1 & & 84.0 & \textbf{73.4}\\
+& Union & 80 & 58.7 & 56.8 & 63.1 & 43.8 & 84.0 & \textbf{73.4}\\
 \end{tabular}
    \caption{Enrichment as Post-processing of various word embeddings using different lexical 
    ontologies. Spearman's correlation (left) and accuracy (right) on different tasks. Bold indicates 
@@ -429,9 +441,9 @@ ontologies we observe that PPDB and WordNet provide good evidence of lexical
 similarity and relatedness. We now examine if we can combine multiple ontologies
 together in a way which can lead to performance gain more than either of these ontologies alone.
 Let $\Omega_{new}$ be the combine ontology and $\Omega_{1}$ and $\Omega_{2}$ be
-the individual ones. For every edge $e_{ij}$ between words $w_i$ and $w_ij$, we let
+the individual ones. For every edge $e_{ij}$ between words $w_i$ and $w_j$, we let
 $e_{ij} \in \Omega_{new}$ if $e_{ij}$ belongs to both $\Omega_{1}$ and $\Omega_{2}$
-or either of them, in effect taking a union and intersection of the ontologies.
+or either of them, in effect taking a union or intersection of the ontologies.
 We then perform enrichment of vectors using the new ontology $\Omega_{new}$ 
 and carry out the evaluation.
 As can be expected, taking union of ontologies performed better than taking intersection and hence we only show the union results in the bottom row of Table~\ref{tab:post-proc}.
@@ -448,9 +460,9 @@ Method & $k$/$\gamma$ & WS-353 & RG-65 & MEN & SYN-REL & TOEFL & SA \\
 \hline
 Baseline & $k=\infty$, $\gamma=0$ & 53.6 & 42.7 & 58.0 & 31.8 & 66.7 & 72.5 \\
 \hline
-\multirow{3}{*}{MAP} & $\gamma=1$ & 54.2 & 46.9 & 57.6 & & 66.6 & \textbf{73.7}\\
- & $\gamma=0.1$ & 54.0 & 50.8 & 58.7 & & 65.3 & 73.3\\
- & $\gamma=0.01$ & \textbf{55.3} & \textbf{52.2} & \textbf{58.7} & & \textbf{69.3} & 72.9\\
+\multirow{3}{*}{MAP} & $\gamma=1$ & 54.2 & 46.9 & 57.6 & 32.1 & 66.6 & \textbf{73.7}\\
+ & $\gamma=0.1$ & 54.0 & 50.8 & 58.7 & 32.2 & 65.3 & 73.3\\
+ & $\gamma=0.01$ & \textbf{55.3} & \textbf{52.2} & \textbf{58.7} & \textbf{33.4} & \textbf{69.3} & 72.9\\
 \hline\hline
 \multirow{3}{*}{SWAP} & $k=100m$ & 57.2 & 61.1 & \textbf{61.8} & \textbf{36.3} & 78.7 & 73.8\\
  & $k=50m$ & \textbf{58.0} & \textbf{62.2} & 61.4 & 32.1 & 85.3 & \textbf{74.4} \\
@@ -462,17 +474,17 @@ Baseline & $k=\infty$, $\gamma=0$ & 53.6 & 42.7 & 58.0 & 31.8 & 66.7 & 72.5 \\
   \label{tab:lbl-tr}
 \end{table*}
 
-We discuss experiments conducted using both \textbf{MAP} and \textbf{SWAP} methods of
+We discuss experiments conducted for both \textbf{MAP} and \textbf{SWAP} methods of
 improving word vectors using prior beliefs while training. For the \textbf{MAP} method
 we update the prior every $k=100,000$ words\footnote{Experiments with $k \in [10000, 50000]$ 
 yielded almost similar results.} and test for different values of $\gamma \in [1, 0.1, 0.01]$.
 For the \textbf{SWAP} method, we update the word vectors using equ.~\ref{equ:update-vector}
 every $k \in [25, 50, 100]$ million words. 
 
-Table~\ref{tab:lbl-tr} shows the results of improvement while training for vectors of length $80$. 
+Table~\ref{tab:lbl-tr} shows the results of improvement while training word vectors of length $80$. 
 We show experimental results 
 with only PPDB (\S\ref{sec:ppdb}) as the ontology for brevity. For \textbf{MAP}
-$\gamma = 0.01$ performs the best although the other values of $\gamma$ also yield very close 
+$\gamma = 0.01$ performs the best although other values of $\gamma$ also yield very close 
 results. For \textbf{SWAP} $k=50$ million perform the best although all other values of $k$
 also perform better than the baseline. Overall we see that the simpler method \textbf{SWAP}
 beats \textbf{MAP} hands down on all the tasks with a big margin.
@@ -490,7 +502,7 @@ beats \textbf{MAP} hands down on all the tasks with a big margin.
 We tested our method on three different languages other than English: German,
 French and Spanish. We used the Universal WordNet \cite{deMeloWeikum2009}, which 
 is an automatically constructed multilingual lexical knowledge base based on 
-WordNet as the ontological resource\footnote{\url{http://www.mpi-inf.mpg.de/yago-naga/uwn/}}. 
+WordNet\footnote{\url{http://www.mpi-inf.mpg.de/yago-naga/uwn/}}. 
 It contains words connected via different lexical relations to other words both
 in and across languages. For a word in a language we only consider links going to
 the other words in the same language to construct the word graph.
@@ -556,9 +568,9 @@ We have proposed a simple and effective method to improve
 word vectors (obtained from different models of word representations)
 using either automatically or human constructed lexical ontologies
 that have explicit information about word relations. We have shown that
-the ontological information is useful and it can be used both during training
+ontological information is useful and it can be used both during training
 the word vectors or as a post-processing operation. We validated the
-applicability of our method across a number of languages and shown that 
+applicability of our method across a number of languages and showed that 
 performance improvement can be obtained on different types of evaluation tasks.
 
 \bibliography{references}
