@@ -1,0 +1,180 @@
+PPDB Weighted,men,mik,0.9
+PPDB Weighted,men,lsa,3.6
+PPDB Weighted,men,fd,3.1
+PPDB Weighted,men,nce,4.1
+PPDB Weighted,men,hu,10.3
+PPDB Weighted,syn,mik,-16.55
+PPDB Weighted,syn,lsa,-10.95
+PPDB Weighted,syn,fd,-22.99
+PPDB Weighted,syn,nce,-4.11
+PPDB Weighted,syn,hu,0.35
+PPDB Weighted,rg,mik,12.5
+PPDB Weighted,rg,lsa,8.3
+PPDB Weighted,rg,fd,4.1
+PPDB Weighted,rg,nce,15.1
+PPDB Weighted,rg,hu,-3.3
+PPDB Weighted,ws,mik,-2.3
+PPDB Weighted,ws,lsa,6.8
+PPDB Weighted,ws,fd,5.3
+PPDB Weighted,ws,nce,6.5
+PPDB Weighted,ws,hu,-1.9
+PPDB Weighted,sent,mik,1.9
+PPDB Weighted,sent,lsa,0.0
+PPDB Weighted,sent,fd,1.1
+PPDB Weighted,sent,nce,0.7
+PPDB Weighted,sent,hu,-0.1
+PPDB Weighted,toefl,mik,15.93
+PPDB Weighted,toefl,lsa,11.9
+PPDB Weighted,toefl,fd,10.6
+PPDB Weighted,toefl,nce,11.93
+PPDB Weighted,toefl,hu,17.33
+fn,men,mik,-5.3
+fn,men,lsa,-0.3
+fn,men,fd,-0.3
+fn,men,nce,-0.8
+fn,men,hu,1.8
+fn,syn,mik,-8.78
+fn,syn,lsa,-3.1
+fn,syn,fd,-5.45
+fn,syn,nce,-3.08
+fn,syn,hu,-0.62
+fn,rg,mik,-0.8
+fn,rg,lsa,0.8
+fn,rg,fd,3.4
+fn,rg,nce,4.7
+fn,rg,hu,4.0
+fn,ws,mik,-9.2
+fn,ws,lsa,0.3
+fn,ws,fd,-1.2
+fn,ws,nce,-1.2
+fn,ws,hu,0.0
+fn,sent,mik,0.8
+fn,sent,lsa,-1.1
+fn,sent,fd,-0.3
+fn,sent,nce,-0.1
+fn,sent,hu,0.2
+fn,toefl,mik,3.93
+fn,toefl,lsa,3.9
+fn,toefl,fd,1.3
+fn,toefl,nce,5.33
+fn,toefl,hu,4.33
+union,men,mik,3.9
+union,men,lsa,3.5
+union,men,fd,3.7
+union,men,nce,5.1
+union,men,hu,7.1
+union,syn,mik,4.28
+union,syn,lsa,7.12
+union,syn,fd,4.87
+union,syn,nce,12.33
+union,syn,hu,3.74
+union,rg,mik,12.6
+union,rg,lsa,8.9
+union,rg,fd,9.7
+union,rg,nce,14.1
+union,rg,hu,7.7
+union,ws,mik,-0.1
+union,ws,lsa,5.0
+union,ws,fd,5.2
+union,ws,nce,5.1
+union,ws,hu,1.9
+union,sent,mik,1.9
+union,sent,lsa,0.1
+union,sent,fd,1.4
+union,sent,nce,0.9
+union,sent,hu,1.5
+union,toefl,mik,10.63
+union,toefl,lsa,7.9
+union,toefl,fd,8.0
+union,toefl,nce,17.33
+union,toefl,hu,11.53
+wn+,men,mik,-0.7
+wn+,men,lsa,3.2
+wn+,men,fd,2.9
+wn+,men,nce,3.5
+wn+,men,hu,6.7
+wn+,syn,mik,-13.49
+wn+,syn,lsa,-6.53
+wn+,syn,fd,-9.57
+wn+,syn,nce,-3.11
+wn+,syn,hu,-1.3
+wn+,rg,mik,11.7
+wn+,rg,lsa,9.5
+wn+,rg,fd,8.5
+wn+,rg,nce,15.4
+wn+,rg,hu,10.2
+wn+,ws,mik,-4.1
+wn+,ws,lsa,3.9
+wn+,ws,fd,4.3
+wn+,ws,nce,5.3
+wn+,ws,hu,2.3
+wn+,sent,mik,1.6
+wn+,sent,lsa,0.9
+wn+,sent,fd,1.4
+wn+,sent,nce,0.6
+wn+,sent,hu,0.1
+wn+,toefl,mik,6.66
+wn+,toefl,lsa,6.6
+wn+,toefl,fd,6.67
+wn+,toefl,nce,8.0
+wn+,toefl,hu,4.35
+ppdb,men,mik,4.2
+ppdb,men,lsa,3.6
+ppdb,men,fd,3.8
+ppdb,men,nce,5.7
+ppdb,men,hu,9.0
+ppdb,syn,mik,6.24
+ppdb,syn,lsa,8.82
+ppdb,syn,fd,4.33
+ppdb,syn,nce,14.76
+ppdb,syn,hu,5.23
+ppdb,rg,mik,11.9
+ppdb,rg,lsa,8.3
+ppdb,rg,fd,4.8
+ppdb,rg,nce,15.6
+ppdb,rg,hu,6.1
+ppdb,ws,mik,1.1
+ppdb,ws,lsa,6.3
+ppdb,ws,fd,6.0
+ppdb,ws,nce,5.5
+ppdb,ws,hu,2.0
+ppdb,sent,mik,1.9
+ppdb,sent,lsa,1.1
+ppdb,sent,fd,0.6
+ppdb,sent,nce,0.9
+ppdb,sent,hu,1.1
+ppdb,toefl,mik,17.33
+ppdb,toefl,lsa,13.3
+ppdb,toefl,fd,12.0
+ppdb,toefl,nce,18.66
+ppdb,toefl,hu,13.04
+WordNet,men,mik,-4.8
+WordNet,men,lsa,1.4
+WordNet,men,fd,1.2
+WordNet,men,nce,1.9
+WordNet,men,hu,3.6
+WordNet,syn,mik,-12.33
+WordNet,syn,lsa,-6.21
+WordNet,syn,fd,-12.34
+WordNet,syn,nce,-4.6
+WordNet,syn,hu,-1.72
+WordNet,rg,mik,9.5
+WordNet,rg,lsa,2.0
+WordNet,rg,fd,0.2
+WordNet,rg,nce,7.9
+WordNet,rg,hu,6.4
+WordNet,ws,mik,-8.8
+WordNet,ws,lsa,3.1
+WordNet,ws,fd,2.2
+WordNet,ws,nce,4.3
+WordNet,ws,hu,0.6
+WordNet,sent,mik,1.2
+WordNet,sent,lsa,0.4
+WordNet,sent,fd,1.4
+WordNet,sent,nce,1.5
+WordNet,sent,hu,0.0
+WordNet,toefl,mik,13.33
+WordNet,toefl,lsa,10.6
+WordNet,toefl,fd,6.67
+WordNet,toefl,nce,12.0
+WordNet,toefl,hu,7.25
