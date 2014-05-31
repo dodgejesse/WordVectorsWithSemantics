@@ -8,11 +8,13 @@
 \usepackage{graphicx}
 \usepackage{multirow}
 \usepackage{color}
+\usepackage{cancel}
 
 \DeclareMathOperator*{\argmin}{arg\,min}
 \DeclareMathOperator*{\argmax}{arg\,max}
 
 \newcommand{\mfar}[1]{\textcolor{blue}{\bf\small [#1 --MFAR]}}
+\newcommand{\jdd}[1]{\textcolor{red}{\bf\small [#1 --JDD]}}
 
 %\title{Improving Vector Space Word Representations\\Using Prior Semantic Beliefs}
 \title{Retrofitting Word Vectors to Semantic Lexicons}
@@ -31,9 +33,7 @@
   yield better quality word representations
   than in isolation. We perform belief propagation on a graph constructed
   using available semantic lexicons to enforce connected words to
-  have similar representations and show that our technique is applicable to
-  different word vectors models across different languages and gives improvement
-  in performance on a variety of evaluation tasks.
+  have similar representations. Our retrofitting approach is modular enough to incorporate this lexical information into any already-learned word vectors, and we show positive results improving state-of-the-art word vectors on a variety of different tasks and across multiple languages.
 \end{abstract}
 
 \section{Introduction}
@@ -46,7 +46,7 @@ properties is a technique of central importance in natural language processing.
 %of words in terms of their frequent contextual patterns. 
 %One such representations is the vector
 %space model of word meaning representation that encodes a word in a vector of real numbers.
-These word vectors can in turn be used for identifying semantically close word 
+These word vectors can in turn be used for \jdd{a number of tasks, including} identifying semantically close word 
 pairs~\cite{Turney:2006:SSR:1174520.1174523,Agirre:2009:SSR:1620754.1620758} or as features
 in downstream applications like named entity recognition~\cite{turian:2010}.
 It is possible to construct high-quality word vectors using cooccurrence 
@@ -61,16 +61,16 @@ and dependency-based context~\cite{Pado:2007:DCS:1268656.1268658}
 have been shown to perform better than their original counterparts. 
 
 In a similar spirit, we propose that
-word vector representations can be further improved by looking at the neighboring words
-in a semantic lexicon. Semantic lexicons like the WordNet~\cite{miller:1995}, 
+word vector representations can be further improved by looking at the \jdd{related} \cancel{neighboring} words
+in a semantic lexicon. Semantic lexicons like \cancel{the} WordNet~\cite{miller:1995}, 
 FrameNet~\cite{Baker:1998:BFP:980845.980860} or the Paraphrase 
 database~\cite{ganitkevitch2013ppdb} contain words that are connected to other words in 
 the same language through specific relations like \textit{synonymy}, \textit{hypernymy},
-\textit{hyponymy}, \textit{paraphrases} etc. . These relations in turn determine the semantic
+\textit{hyponymy}, \textit{paraphrases} etc. . These relations \cancel{in turn determine} \jdd{represent} the semantic
 association between the words. In particular, the existence of a \textit{synonymy} relation 
-between two words is a strong indication for them to have similar vector representations.
+between two words is a strong indication \jdd{that they should} \cancel{for them to} have similar vector representations.
 For example, in WordNet the words \textit{scream} and \textit{yell} appear as synonyms
-and hence we posit that there word vector representations should be close. 
+and hence we posit that \jdd{their} \cancel{there} word vector representations should be close. 
 This is an important source of information that has not been 
 systematically exploited in creating word vectors so far.
 
@@ -101,16 +101,16 @@ word senses (\S\ref{sec:word-sense}).
   \label{fig:word-graph}
 \end{figure}
 
-Let $W = \{w_1,...,w_n\}$ be the set of word types and $\Omega$ be an ontology that encodes a set of semantic relations between words in $W$. 
+Let $W = \{w_1,...,w_n\}$ be the set of word types and $\Sigma$ be an ontology that encodes a set of semantic relations between words in $W$. 
 Specifically, we define $\Omega = (V_\Omega,E_\Omega)$ to be an undirected graph with vertices $V_\Omega = \{v_i | \  \forall \  w_i \in W\}$ and 
-edges $E_\Omega = \{e_{ij}\}$ for every pair of words $(w_i,w_j)$ that are semantically linked according to different semantic relations. These relations differ for different semantic lexicons as described later in~\S\ref{sec:lexicons}.
-Since majority of the existing word representation models ignore word-senses,
-we consider $\forall i, w_i$ to represent undisambiguated word-types, however our model
+edges $E_\Omega = \{e_{ij}\}$ for every pair of words $(w_i,w_j)$ that are semantically linked \jdd{within $\Sigma$ } \cancel{according to different semantic relations}. These relations differ for different semantic lexicons as described later in~\S\ref{sec:lexicons}.
+Since \jdd{the} majority of the existing word representation models ignore word-senses,
+we consider \cancel{ $\forall i, w_i$} \jdd{$ w_i,\forall i$} to represent undisambiguated word-types; our model, however,
 can be augmented to induce representations for sense-specific vectors as well (\S\ref{sec:word-sense}).
 
 Then, given a set of word vectors $\hat{Q} = \{\hat{q}_i | \  \forall \  w_i \in W\}$ that have 
 either been learned from any of the currently available
-methods (described later in \S\ref{sec:vectors}) or are currently being learnt, 
+methods (described later in \S\ref{sec:vectors}) or are currently being learned, 
 our objective is to learn a set of vectors $Q = \{q_i | \  \forall \  w_i \in W\}$ that are 
 consistent with both $\hat{Q}$ and neighboring nodes in $\Omega$ by a notion of 
 distance metric between vectors. 
@@ -122,13 +122,14 @@ and then perform inference to obtain the unobserved (and retrofitted) word repre
 
 We define the distances between any two nodes as the euclidean distance\footnote{Theoretically, using negative cosine similarity as distance yields the same update equation for vectors of unit length}
  between their word vectors, thus forcing 
-neighboring nodes to have similar vector representations. Since, we want the inferred word vector to be
+neighboring nodes to have similar vector representations. Since we want the inferred word vector \jdd{$q_i$} to be
 associated both with its observed value $\hat{q}_i$ and its neighbors 
 $q_j, \forall ij \in E_{\Omega}$, the objective becomes:
 \begin{equation}
   \label{equ:eucl}
   \displaystyle \Psi(Q) = \sum_{i=1}^n \left[ \alpha_i \lVert q_i - \hat{q_i} \rVert^2 + \sum_{ij \in E_{\Omega}} \beta_{ij} \lVert q_i - q_j \rVert^2 \right]
 \end{equation}
+\jdd{I would rather the inner sum be like this: $\sum\limits_{j\in E_{\Omega_i}}$ so we're not looping over i twice. maybe there's a better solution with something like $\sum\limits_{j\in\{i,j\} s.t. e_{i,j}\in E_\Omega}$, which is more accurate but too long.}
 where, $\beta_{ij}$ is the weight of the edges (details in \S\ref{sec:exp-post-proc}) 
 connecting $i,j$ and $\alpha_i$ is a parameter to control the degree of deviation of the word 
 vector from its observed value. We now look at two different ways of 
@@ -138,16 +139,17 @@ as a post-processing step after training the word vectors and during training th
 \subsection{Retrofitting by Post-processing}
 \label{sec:post-proc}
 
-In this case, we first train the word vectors independent of the information in the semantic lexicons
-and later retrofit them as a post-processing step. Equation~\ref{equ:eucl} is a convex 
-optimization problem whose solution is solving a system of linear equations involving inversion of a 
-large matrix which is $O(n^3)$, thus instead we use an iterative update schema for 
+In this \cancel{case}\jdd{approach}, we first train the word vectors independent of the information in the semantic lexicons
+and \cancel{later} \jdd{then} retrofit them as a post-processing step. Equation~\ref{equ:eucl} is a convex 
+optimization problem whose solution \cancel{is} \jdd{involves} solving a system of linear equations, \cancel{involving} \jdd{including} inversion of a 
+large matrix which is $O(n^3)$; \cancel{thus} instead we use an iterative update \jdd{scheme} \cancel{schema} for 
 optimization~\cite{Bengio+al-ssl-2006,Subramanya:2010:EGS:1870658.1870675,das-petrov:2011:ACL-HLT2011,das-smith:2011:ACL-HLT2011}.
-We take the gradient of equation~\ref{equ:eucl} with respect to the parameters to be optimized, namely: $\forall i, q_i$ and equate it to zero to get the following update for $q_i$:
+We take the gradient of equation~\ref{equ:eucl} with respect to the parameters to be optimized, namely: \cancel{$\forall i, q_i$}\jdd{$q_i,\forall i$} and equate it to zero to get the following update\cancel{ for $q_i$}:
 \begin{equation}
   \label{equ:update-vector}
 q_i = \frac{\sum_{j, ij \in E} \beta_{ij} q_j + \alpha \hat{q_i}}{\sum_{j, ij \in E} \beta_{ij} + \alpha}
 \end{equation}
+
 In practice running this procedure for $10$ iterations leads to convergence. This is a simple 
 post-processing model that can work with any kind of word vector representations.
 
@@ -199,7 +201,7 @@ and use pre-trained vectors from other models (\S\ref{sec:gc},\S\ref{sec:multi})
 \subsection{Latent Semantic Analysis (LSA)}
 \label{sec:lsa}
 
-We perform latent semantic analysis~\cite{deerwester-90} on a word-word co-occurrence matrix.
+\jdd{To learn these word vectors, }we perform latent semantic analysis~\cite{deerwester-90} on a word-word co-occurrence matrix.
 We construct a word co-occurrence frequency matrix for a given training corpus where
 each row $\boldsymbol{w}$, represents one word in the corpus and every column $\boldsymbol{c}$, is the context 
 feature in which the word is observed. In our case, every column is a word which occurs
@@ -216,12 +218,12 @@ representation of words from size $O(n)$ to $k$ by selecting the first $k$ colum
 \subsection{Skip-gram Vectors (SG)}
 \label{sec:sg}
 
-\texttt{Word2Vec} word vector tool~\cite{mikolov2013efficient} is currently the fastest and 
-the most used tool for obtaining word 
+\jdd{The} \texttt{Word2Vec} word vector tool~\cite{mikolov2013efficient} is currently the fastest and 
+the most \jdd{widely-}used tool for obtaining word 
 vector representations from an unlabeled 
 corpus.\footnote{\url{https://code.google.com/p/word2vec/}}
 Every word in the skip-gram model is represented by its Huffman code~\cite{citeulike:1320251}. In 
-this model, each current word is used as an input to a log-linear classifier
+this model, each \cancel{current} word is used as an input to a log-linear classifier
 with continuous projection layer and words within a certain range before and after the word
 are predicted. 
 
@@ -239,7 +241,7 @@ These word vectors~\cite{faruqui-dyer:2014:EACL2014} have been created using spe
 \label{sec:lbl}
 
 The log bilinear language model~\cite{MnihTeh2012} predicts a word given its
-context where every word 
+context. \cancel{ where every word } \jdd{maybe this commented out line wasn't supposed to be commented out?}
 %$w$ is represented by a word vector $q_w$ and a bias $b_w$ which constitute the parameters $\theta$ of the model. 
 If $h$ is set of context words, then the association between the target word 
 and the context is defined
@@ -257,7 +259,7 @@ learning rate of $0.05$.
 \section{Semantic Lexicons}
 \label{sec:lexicons}
 
-We use three different semantic lexicons to evaluate their utility in improving
+\jdd{In this section, we describe the three lexical ontologies used in our experiments. These ontologies were simple to fit into our approach, but this technique can be easily extended to any ontology which encodes relations between word types.} We use three different semantic lexicons to evaluate their utility in improving
 the word vectors.
 % and then merge them all together to act as a single large ontological resource.
 
@@ -268,16 +270,16 @@ The paraphrase database (PPDB) \cite{ganitkevitch2013ppdb} is a semantic lexicon
 Since, PPDB is an automatically created ontology, it has confidence score for a word being 
 paraphrased into another word. We conduct two sets of 
 experiments using the 
-PPDB: (1) All the edge weights are equal, (2) Different edge weights for each neighbor (cf. \S\ref{sec:expts}). 
+PPDB: (1) The $\alpha$s in equation \ref{equ:euc} are set to 1, (2) The $\alpha$s in \ref{equ:euc} are set to the weights from PPDB(cf. \S\ref{sec:expts}). 
 
 \subsection{WordNet} 
 \label{sec:wordnet}
 
 WordNet~\cite{miller:1995} is a large, hand-annotated semantic lexicon of English words. 
 It groups English words into sets of synonyms called synsets, provides short, general definitions, and records the various semantic relations between these synonym sets.
-This database is structured in a graph particularly suitable for our task because it explicitly relates concepts with semantically aligned relations such as hypernyms and hyponyms. For example, the word \textit{dog} has a synonym \textit{canine}, a hypernym \textit{puppy} and a hyponym \textit{animal}. We perform two different experiments with WordNet where a given word is connected to
-its: (1) synonyms, (2) synonyms, hypernyms and hyponyms. 
-We get a graph of $148,000$ nodes and $560,000$ edges.
+This database is structured in a graph particularly suitable for our task because it explicitly relates concepts with semantically aligned relations such as hypernyms and hyponyms. For example, the word \textit{dog} has a synonym \textit{canine}, a hypernym \textit{puppy} and a hyponym \textit{animal}. We perform two different experiments with WordNet where a given word is connected to \jdd{either}
+its (1) synonyms, \jdd{or} (2) synonyms, hypernyms, and hyponyms. 
+\jdd{Using this ontology,} we get a graph of $148,000$ nodes and $560,000$ edges. \jdd{Which setup gives us this number of edges? They must vary between WordNet and WordNet++, which are outlined here.}
 
 \subsection{FrameNet}
 \label{sec:framenet}
@@ -288,7 +290,7 @@ a semantic representation that blends word-sense disambiguation and semantic rol
 \cite{Baker:1998:BFP:980845.980860} is a taxonomy of manually identified general-purpose frames for English. 
 Listed in the lexicon with each frame are several lemmas that can denote the frame or some aspect of it. 
 We use this grouping of words in a particular frame as evidence that these words are semantically related and
-connect all words in one frame to each other in our word graph. For example, the frame \texttt{CAUSE CHANGE POSITION ON A SCALE} contains words \textit{push, raise} and \textit{growth}. We get a graph of $11,000$ nodes and $210,000$ edges. 
+connect all words in one frame to each other in our word graph. For example, the frame \texttt{CAUSE CHANGE POSITION ON A SCALE} contains words \textit{push, raise} and \textit{growth}. \jdd{Using this ontology,} we get a graph of $11,000$ nodes and $210,000$ edges. 
 
 \section{Evaluation Benchmarks}
 \label{sec:eval}
@@ -301,10 +303,10 @@ along with an extrinsic sentiment analysis task.
 \label{sec:word-sim}
 
 We evaluate our word representations on a variety of different benchmarks that
-have been widely used to measure word similarity. The first one is the \textbf{WS-353}
-dataset~\cite{citeulike:379845} containing 353 pairs of English words that have been 
-assigned similarity ratings by humans. The second benchmark is the \textbf{RG-65} 
-\cite{Rubenstein:1965:CCS:365628.365657} dataset that contain 65 pairs of nouns. 
+have been widely used to measure word similarity. The first \cancel{one} is the \textbf{WS-353}
+dataset~\cite{citeulike:379845}, containing 353 pairs of English words that have been 
+assigned similarity ratings by humans. The second \cancel{benchmark} is the \textbf{RG-65} 
+\cite{Rubenstein:1965:CCS:365628.365657} dataset, \cancel{that contain} \jdd{containing} 65 pairs of nouns. 
 Since the commonly used word similarity datasets contain a small number of word pairs we
 also use the \textbf{MEN} dataset~\cite{bruni:2012} that contains $3000$ word 
 pairs which have been sampled from words
@@ -331,7 +333,7 @@ as the missing word placeholder.
 \label{sec:syn-rel}
 
 \newcite{mikolov-yih-zweig:2013:NAACL-HLT} present a new syntactic relation dataset composed of analogous word pairs. 
-It contains pairs of tuples of word relations that follow a common syntatic relation. For example, in \textit{walking} and \textit{walked}, the second word is the past tense
+It contains pairs of tuples of word relations that follow a common syntatic relation. For example, in \textit{walking} and \textit{walked}, the second word is the past tense \jdd{form}
 of the first word. There are nine such different kinds of relations: adjective-adverb,
 opposites, comaparative, superlative, present-participle, 
 nation-nationality, past tense, plural nouns and plural verbs.
@@ -384,38 +386,38 @@ as a post-processing step or during training.
 \label{sec:exp-post-proc}
 
 We use equ.~\ref{equ:update-vector} to optimize word vectors using different 
-semantic lexicons under different settings as described below.
+semantic lexicons under different settings as described below. \jdd{The structure of the ontology chosen informs the structure of the graph used in our optimization procedure.}
 
-\paragraph{PPDB.} There exists an edge between a word and all its paraphrases. For every word $w_i$, we set $\alpha_i = 1$ and the edge weight for every neighbor $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. This makes sure that the optimized word vector is still not very far from its originally observed estimate.
+\paragraph{PPDB.} There exists an edge between a word and all its paraphrases \jdd{in PPDB}. For every word $w_i$, we set $\alpha_i = 1$ and the edge weight for every neighbor $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. This \jdd{ensures} \cancel{makes sure} that the optimized word vector is still not very far from its originally observed estimate.
 
 \paragraph{wtPPDB.} PPDB has weights associated with every paraphrase word pair $p(w_i | w_j)$ and $p(w_j |w_i)$ which are the conditional probabilities of 
-observing the paraphrase given the word and vice versa obtained empirically during the construction of the PPDB. We define $\forall j, \beta_{ij} = p(w_i | w_j)/2 + p(w_j |w_i)/2$ and keep $\alpha_i = 1$ as in the previous experiment.
+observing the paraphrase given the word and vice versa obtained empirically during the construction of the PPDB. We define $\forall j, \beta_{ij} = p(w_i | w_j)/2 + p(w_j |w_i)/2$ and keep $\alpha_i = 1$ as in the previous experiment. 
 
-\paragraph{WN.} There exists an edge between a word and all of its synonyms. 
+\paragraph{WN.} There exists an edge between a word and all of its synonyms \jdd{in WordNet}. 
 For every word $w_i$, we set $\alpha_i = 1$ and the edge weight for every neighbor 
 $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. 
 
 \paragraph{WN++.} There exists an edge between a word and all of its synonyms, 
-hypernyms and hyponyms. For every word $w_i$, we set $\alpha_i = 1$ and the edge weight
+hypernyms and hyponyms \jdd{in WordNet}. For every word $w_i$, we set $\alpha_i = 1$ and the edge weight
 for every neighbor $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. 
 
 \paragraph{FN.} There exists an edge between all the words that evoke the same 
-semantic frame. For every word $w_i$, we set $\alpha_i = 1$ and the edge weight
+semantic frame \jdd{in FrameNet}. For every word $w_i$, we set $\alpha_i = 1$ and the edge weight
 for every neighbor $\forall j, \beta_{ij} = 1/N$, where $N$ is the number of neighbors of the word. 
 
 \paragraph{Results.} Figure~\ref{fig:post-proc} shows the absolute improvements
 in both the spearman's correlation ratio and the accuracy obtained on different
 tasks over the baseline. Every row of plots shows one semantic lexicon being used
-for retrofitting. The different vector models are shown in different colors. 
+for retrofitting \jdd{, while every column shows one evaluation task}. The different vector models are shown in different colors. 
 
 We see that all the lexicons are helpful in improving
 the Spearman's correlation ratio in the word similarity tasks. However, FrameNet is
-either not improving the results or even making them worse in many cases, for example the skip-gram and multilingual vectors. In the syntactic relation task (\S\ref{sec:syn-rel}), 
-we get huge improvements of the order of $10$ absolute points
-in accuracy for all ontologies except for FrameNet. For the extrinsic sentiment analysis task (\S\ref{sec:senti}) we get improvements using all the ontologies and achieve the highest improvement of absolute $1.4$ points in accuracy for the multilingual vectors over the baseline (\S\ref{sec:multi}).
+either not improving the results or \cancel{even} making them worse in many cases (\cancel{for example} \jdd{e.g.} the skip-gram and multilingual vectors). In the syntactic relation task (\S\ref{sec:syn-rel}), 
+we get huge improvements \cancel{of} \jdd{on} the order of $10$ absolute points
+in accuracy for all ontologies except for FrameNet. For the extrinsic sentiment analysis task (\S\ref{sec:senti}) we get improvements using all the ontologies and achieve the highest improvement of absolute $1.4$ points in accuracy for the multilingual vectors over the baseline (\S\ref{sec:multi}). \jdd{Though not as large as on the other tasks, this gain} 
 is statistically significant ($p<0.01$) according to a McNemar's test~\cite{Dietterich98approximatestatistical}.
 
-Interestingly, \textbf{wtPPDB} is almost as good as or even worse than 
+Interestingly, \textbf{wtPPDB} is \jdd{not better} \cancel{almost as good as or even worse} than 
 the uniformly weighted \textbf{PPDB} 
 setting which signifies that PPDB already has a highly confident
 set of paraphrases which are of equal quality. 
@@ -435,13 +437,13 @@ We then perform retrofitting of vectors using the new lexicon and carry out the 
 As can be expected, taking union of ontologies performed better than taking 
 intersection and hence we only show the union results in the bottom 
 row of figure~\ref{fig:post-proc}. We only explore the union of WordNet and 
-PPDB and exclude FrameNet as it did not give positive results on its own.
+PPDB and exclude FrameNet as it did not give positive results on its own. \jdd{We should move this to where we're describing how we've made all of the graphs, immediately after the ``FN'' paragraph.  It should be titled ``Union'' and should be described in the same way as the other graph generation procedures. We can still say we took the union of the best two ontologies, and that the intersection didn't help, but this paragraph should be with those others.}
 
 \begin{figure*}[!tb]
   \centering
   \includegraphics[width=2\columnwidth]{plots_weighted_ppdb_wordnet.pdf}
-  \caption{Absolute improvement in the Spearman's correlation ratio (3 left columns) and accuracy (3 right 
-  columns) using different semantic lexicons.}
+  \caption{Absolute improvement in \cancel{the} Spearman's correlation ratio (3 left columns) and accuracy (3 right 
+  columns) using different semantic lexicons on different tasks. \jdd{Comparing vertically shows which ontologies perform better. }}
   \label{fig:post-proc}
 \end{figure*}
 
@@ -478,16 +480,16 @@ MAP estimation. For the \textbf{XYZ} method
 we update the prior every $k=100,000$ words\footnote{Experiments with $k \in [10000, 50000]$ 
 yielded almost similar results.} and test for different values of $\gamma \in [1, 0.1, 0.01]$.
 For the \textbf{ABC} method, we update the word vectors using equ.~\ref{equ:update-vector}
-every $k \in [25, 50, 100]$ million words. 
+every $k*10^6, k \in [25, 50, 100]$ words. 
 
 Table~\ref{tab:lbl-tr} shows the results of improvement while training word vectors of length $80$. 
 We show experimental results 
 with only PPDB (\S\ref{sec:ppdb}) as the ontology. For \textbf{XYZ}
 $\gamma = 0.01$ performs the best although other values of $\gamma$ also yield very close 
-results. For \textbf{ABC} $k=50$ million perform the best although all other values of $k$
+results. For \textbf{ABC} \cancel{$k=50$}\jdd{$k=5*10^6$} perform the best although all other values of $k$
 also perform better than the baseline. Overall we see that the both the methods lead to 
 improvement in performance across all tasks however \textbf{ABC} is relatively better in
-performance.
+performance. \jdd{We have to have at least a sentence or two comparing these results to the improvement in the table above it. We can say something like ``We see similar gains, which aren't as large as in post processing.''}
 
 \subsection{Multilingual Evaluation}
 \label{sec:multilingual}
@@ -537,6 +539,7 @@ different kinds of vectors.
   \label{fig:sense-graph}
 \end{figure}
 
+\jdd{I would remove the question mark from the title. I think this is a good step towards learning sense-specific vectors, and lays the groundwork for future research.}
 Most word vector models assign one vector to each word type
 ignoring the possibility that the same word type may have more than one meaning. 
 Should an obviously polysemous word like \textit{bank} really be represented using
@@ -545,15 +548,15 @@ Two previous efforts have attempted to learn sense-specific vectors by
 clustering contexts to discriminate
 word senses into multiple prototype vectors~\cite{reisinger:naacl10,huang2012improving}. 
 However, the resulting vectors
-lack interpretability and cannot be matched to senses present in a lexicon,
-for ex., WordNet.
+lack interpretability and cannot be matched to senses present in a lexicon \jdd{such as Wordnet}\cancel{
+for ex., WordNet}.
 
-We augment our retrofitting framework (\S\ref{sec:framework}) using WordNet
-that provides information about the number of senses for a particular word
-and its synset (synonym set). We introduce an unobserved node for every sense of a 
+We augment our retrofitting framework (\S\ref{sec:framework}) using WordNet, \jdd{which}
+\cancel{that} provides information about the number of senses for a particular word
+and its \jdd{synonyms} \cancel{synset (synonym set)}. We introduce an unobserved node for every sense of a 
 word and connect all of them to one observed node in the graph, which represents the word
 vector obtained for that word from a word vector model. We then connect
-each of these nodes to other words in its synset in the regular manner. 
+each of these nodes to \cancel{other words in its synset}\jdd{it's synonyms} in the regular manner. 
 For example, in figure~\ref{fig:sense-graph}, for the word \textit{bank}, 
 if we have two senses in the WordNet,
 we create two unobserved nodes each connected to the observed node representing
@@ -593,7 +596,7 @@ climber\%1:20:00:: (a vine or climbing plant) & woodbine\%1:20:02:: & brier\%1:2
 \end{center}
 \end{table*}
 
-In table \ref{tbl:mostsim} we present some analysis that qualitatively attempts to evaluate the nature of 
+In table \ref{tbl:mostsim} we present some analysis that qualitatively \cancel{attempts to evaluate} \jdd{evaluates} the nature of 
 sense-specific word vectors. The table shows the three most similar words of an ambiguous word in standard SG model (\S\ref{sec:sg}) in comparison with the three most similar words of different word senses of the same word in the disambiguated SG model. 
 The standard vector models %almost always capture only the 
 are either dominated by the most frequent sense or they mix multiple senses of a word. 
